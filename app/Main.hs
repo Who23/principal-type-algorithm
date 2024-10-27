@@ -32,7 +32,10 @@ instance Show LambdaCalculus where
 
 instance Show Type where
     show (Phi i) = show i
-    show (Arrow a b) = "(" ++ show a ++ ") -> (" ++ show b ++ ")"
+    show (Arrow a b) = paren a ++ " -> " ++ show b
+        where
+            paren t@(Arrow _ _) = "(" ++ show t ++ ")"
+            paren t             = show t
 
 substitute :: Substitution -> Type -> Type
 substitute (Substitution s) (Phi i) 
