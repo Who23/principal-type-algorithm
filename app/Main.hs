@@ -2,8 +2,11 @@ module Main where
 
 import Data.Map (Map)
 import qualified Data.Map as M
+import Data.Set (Set)
+import qualified Data.Set as S
 import Data.Maybe
 import Control.Monad.State
+import Data.Char
 
 data LambdaCalculus = Var Char | Abs Char LambdaCalculus | App LambdaCalculus LambdaCalculus
 data Type = Phi Int | Arrow Type Type
@@ -30,8 +33,9 @@ instance Show LambdaCalculus where
             showr l           = show l
 
 
+-- assumes types start at 1 and don't exceed 26 type vars
 instance Show Type where
-    show (Phi i) = show i
+    show (Phi i) = [chr (i + ord 'a' - 1)] -- show i
     show (Arrow a b) = paren a ++ " -> " ++ show b
         where
             paren t@(Arrow _ _) = "(" ++ show t ++ ")"
@@ -66,8 +70,22 @@ unifyCtx gamma1 gamma2 = M.foldl composeSubstitution empty gamma'
         empty = Substitution M.empty
 
 pp :: LambdaCalculus -> Type
-pp l = snd (evalState (pp' l) 0)
+pp l = renumber lt
     where
+        lt = snd (evalState (pp' l) 0)
+
+        renumber :: Type -> Type
+        renumber t = substitute s t
+            where
+                s = Substitution ((M.fromList . enum . S.toList . getTypes) t)
+
+                enum xs = zip xs (map Phi [1..])
+                
+                getTypes :: Type -> Set Int
+                getTypes (Phi v) = S.singleton v
+                getTypes (Arrow a b) = S.union (getTypes a) (getTypes b)
+
+
         fresh :: State Int Int
         fresh = do i <- get
                    put (i + 1)
