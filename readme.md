@@ -7,12 +7,17 @@ todo:
 ```
 $ cabal repl
 
+ghci> sCombinator 
+λxyz.xz(yz)
+ghci> kCombinator 
+λxy.x
+ghci> iCombinator 
+λx.x
+
 ghci> pp sCombinator
 (a -> b -> c) -> (a -> b) -> a -> c
-
 ghci> pp kCombinator
 a -> b -> a
-
 ghci> pp iCombinator
 a -> a
 ```
