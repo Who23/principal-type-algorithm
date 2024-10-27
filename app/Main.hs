@@ -56,7 +56,14 @@ composeSubstitution s1@(Substitution s1m) (Substitution s2m) = Substitution (M.u
 
 unify :: Type -> Type -> Substitution
 unify (Phi x) (Phi y)   = Substitution (M.singleton x (Phi y))
-unify (Phi x) t         = Substitution (M.singleton x t)
+unify (Phi x) t
+    | not (occurs x t)  = Substitution (M.singleton x t)
+    | otherwise = error "unifcation failure"
+    where
+        occurs :: Int -> Type -> Bool
+        occurs i (Phi y) = i == y
+        occurs i (Arrow a b) = occurs i a || occurs i b
+
 unify t       p@(Phi _) = unify p t
 unify (Arrow a b) (Arrow c d) = composeSubstitution s2 s1
     where
