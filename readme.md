@@ -4,7 +4,7 @@ principal type algorithm for curry types in vanilla lambda calculus
 todo:
 - parse lambda calculus types nicely for input
 - rename type variables at the end to start from 1 & use letters
-- remove parens in show instances for lambda calc & types
+- remove parens in show instances for types
 
 ```
 $ cabal repl

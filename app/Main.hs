@@ -12,8 +12,23 @@ newtype Substitution = Substitution (Map Int Type) deriving Show
 
 instance Show LambdaCalculus where
     show (Var c) = [c]
-    show (Abs a b) = "(λ" ++ [a] ++ "." ++ show b ++ ")"
-    show (App m n) = "(" ++ show m ++ show n ++ ")"
+    show (Abs a b) = "λ" ++ a:vars ++ "." ++ show inner
+        where
+            (vars, inner) = nested b
+            
+            nested :: LambdaCalculus -> ([Char], LambdaCalculus)
+            nested (Abs x y) = (x:xs, y')
+                where (xs, y') = nested y
+            nested l         = ([], l)
+    show (App m n) = showl m ++ showr n
+        where
+            showl l@(Abs _ _) = "(" ++ show l ++ ")"
+            showl l           = show l
+
+            showr l@(App _ _) = "(" ++ show l ++ ")"
+            showr l@(Abs _ _) = "(" ++ show l ++ ")"
+            showr l           = show l
+
 
 instance Show Type where
     show (Phi i) = show i
